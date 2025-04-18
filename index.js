@@ -6,7 +6,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('STRIPE_SECRET_KEY is not defined in environment variables');
+}
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: '2023-10-16',
 });
@@ -20,6 +24,17 @@ app.get('/', (req, res) => {
 
 app.post('/create-checkout-session', async (req, res) => {
   try {
+    const { qrId, level } = req.body;
+
+    if (!qrId || !level) {
+      return res.status(400).json({ error: 'Missing qrId or level' });
+    }
+
+    const amount = level === 'premium' ? 2000 : level === 'platinum' ? 20000 : null;
+    if (!amount) {
+      return res.status(400).json({ error: 'Invalid QR code level for payment' });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -28,15 +43,15 @@ app.post('/create-checkout-session', async (req, res) => {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: 'Premium QR Code Activation',
+              name: `${level.charAt(0).toUpperCase() + level.slice(1)} QR Code Activation`,
             },
-            unit_amount: 2000, // 20 EUR in cents
+            unit_amount: amount,
           },
           quantity: 1,
         },
       ],
-      success_url: 'https://stiapp.sk/success',
-      cancel_url: 'https://stiapp.sk/cancel',
+      success_url: `stiapp://qr-activate-success?qrId=${qrId}`,
+      cancel_url: 'stiapp://qr-activate-cancel',
     });
 
     res.json({ url: session.url });
@@ -49,4 +64,3 @@ app.post('/create-checkout-session', async (req, res) => {
 app.listen(port, () => {
   console.log(`🚀 Server running on port ${port}`);
 });
-
