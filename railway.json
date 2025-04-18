@@ -1,0 +1,9 @@
+{
+  "build": {
+    "env": {
+      "NODE_ENV": "development"
+    }
+  },
+  "start": "node index.js",
+  "engine": "node"
+}
