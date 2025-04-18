@@ -1,0 +1,1 @@
+# qrifyme-stripe
