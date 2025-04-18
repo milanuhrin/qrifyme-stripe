@@ -55,8 +55,8 @@ app.post('/create-checkout-session', async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `qrifyme://qr-activate-success?qrId=${qrId}`,
-      cancel_url: 'https://qrifyme.app/cancel',
+      success_url: `https://milanuhrin.github.io/qrifyme-redirect/?qrId=${qrId}`,
+      cancel_url: 'https://milanuhrin.github.io/qrifyme-redirect/?cancelled=true',
     });
 
     console.log('✅ Stripe session created:', session);
