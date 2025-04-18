@@ -25,15 +25,20 @@ app.get('/', (req, res) => {
 app.post('/create-checkout-session', async (req, res) => {
   try {
     const { qrId, level } = req.body;
+    console.log('📥 Request body:', req.body);
 
     if (!qrId || !level) {
+      console.warn('⚠️ Missing qrId or level');
       return res.status(400).json({ error: 'Missing qrId or level' });
     }
 
     const amount = level === 'premium' ? 2000 : level === 'platinum' ? 20000 : null;
     if (!amount) {
+      console.warn('⚠️ Invalid QR code level:', level);
       return res.status(400).json({ error: 'Invalid QR code level for payment' });
     }
+
+    console.log('💰 Creating session with amount:', amount);
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -54,9 +59,11 @@ app.post('/create-checkout-session', async (req, res) => {
       cancel_url: 'https://qrifyme.app/cancel',
     });
 
+    console.log('✅ Stripe session created:', session);
+
     res.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    console.error('❌ Stripe checkout error:', error); // <-- vypíše celé error telo
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
