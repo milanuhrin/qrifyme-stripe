@@ -50,8 +50,8 @@ app.post('/create-checkout-session', async (req, res) => {
           quantity: 1,
         },
       ],
-      success_url: `stiapp://qr-activate-success?qrId=${qrId}`,
-      cancel_url: 'stiapp://qr-activate-cancel',
+      success_url: `qrifyme://qr-activate-success?qrId=${qrId}`,
+      cancel_url: 'https://qrifyme.app/cancel',
     });
 
     res.json({ url: session.url });
