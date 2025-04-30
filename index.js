@@ -63,7 +63,7 @@ app.post('/create-checkout-session', async (req, res) => {
 
     res.json({ url: session.url });
   } catch (error) {
-    console.error('❌ Stripe checkout error:', error); // <-- vypíše celé error telo
+    console.error('❌ Stripe checkout error:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
